@@ -32,3 +32,17 @@ Function Get-AWSUserdataScript {
     $userdata = Invoke-RestMethod -Headers @{"X-aws-ec2-metadata-token" = $token} -Method GET -Uri "http://169.254.169.254/latest/user-data"
     $userdata
 }
+
+Function Get-AzureCompute {
+    param (
+        [Switch]$AsJson
+    )
+    $uri = "http://169.254.169.254/metadata/instance?api-version=2021-02-01"
+    $data = Invoke-RestMethod -Headers @{"Metadata"="true"} -Method GET -Uri $uri
+    if ($AsJson) {
+        return $data | ConvertTo-Json -Depth 10
+    } else {
+        return $data
+    }
+
+}
