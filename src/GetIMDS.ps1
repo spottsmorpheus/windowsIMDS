@@ -33,6 +33,24 @@ Function Get-AWSUserdataScript {
     $userdata
 }
 
+Function Get-AWSMetadata {
+    param (
+        [String]$Endpoint="",
+        [Switch]$AsJson
+    )
+
+    # IDMS v2 needs a token 
+    $token = Invoke-RestMethod -Headers @{"X-aws-ec2-metadata-token-ttl-seconds" = "21600"} -Method PUT -Uri http://169.254.169.254/latest/api/token
+    $uri = "http://169.254.169.254/latest/meta-data"
+    if ($Endpoint) {$uri = "{0}/{1}" -f $uri,$Endpoint}
+    $metadata = Invoke-RestMethod -Headers @{"X-aws-ec2-metadata-token" = $token} -Method GET -Uri $uri
+    if ($AsJson) {
+        return $metadata | Convertto-Json -Depth 10
+    } else {
+        return $metadata
+    } 
+}
+
 Function Get-AzureCompute {
     param (
         [Switch]$AsJson
